@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react";
 import { Table, Button } from 'antd';
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import "./BookList.css"
+import { withRouter } from "react-router-dom";
 
-const BookList = () => {
+const BookList = (props) => {
     const columns = [
         {
             title: 'Name',
@@ -27,6 +28,10 @@ const BookList = () => {
         },
     ];
 
+    const redirectToCreate = () => {
+        props.history.push(`/books/create`);
+    }
+
     const [books, setBooks] = useState([]);
 
     useEffect(() => {
@@ -46,7 +51,12 @@ const BookList = () => {
 
     return (
         <div className="BookList.content">
-            <Button className="button-header" type="primary" icon={<PlusOutlined />}>
+            <Button
+                className="button-header"
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={redirectToCreate}
+            >
                 Create
             </Button>
             <Table dataSource={books} columns={columns} />
@@ -54,4 +64,4 @@ const BookList = () => {
     );
 }
 
-export default BookList;
+export default withRouter(BookList);
