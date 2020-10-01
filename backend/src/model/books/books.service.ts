@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { InjectFirebaseAdmin, FirebaseAdmin } from 'nestjs-firebase';
-import { database } from 'firebase-admin';
 import { BooksDTO } from './books.dto';
 
 @Injectable()
@@ -11,8 +10,9 @@ export class BooksService {
     ) { }
 
     preprocessData(data: any): any {
-        if (data.hasOwnProperty("date"))
+        if (data.hasOwnProperty("date")) {
             data.date = data.date.toDate().toISOString().substring(0, 10);
+        }
         else
             data.date = null;
         return data;
@@ -35,6 +35,7 @@ export class BooksService {
     }
 
     async create(bookDTO: BooksDTO): Promise<any> {
+        bookDTO.date = new Date(bookDTO.date)
         console.log(bookDTO);
         const doc = await this.firebase.db.collection('books').add(bookDTO);
         console.log('Added document with ID: ', doc.id);

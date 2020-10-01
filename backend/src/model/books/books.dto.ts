@@ -4,6 +4,6 @@ export class BooksDTO {
 
     readonly author: string;
 
-    readonly date: string | Date | undefined;
+    date: Date | string;
 
 }
