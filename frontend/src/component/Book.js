@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Form, Input, Button, DatePicker } from 'antd';
 import axios from 'axios';
-import { Redirect, withRouter } from "react-router-dom";
+import { withRouter } from "react-router-dom";
+import moment from 'moment';
 
 const layout = {
     labelCol: {
@@ -19,7 +20,7 @@ const tailLayout = {
 };
 
 const Book = (props) => {
-    const onFinish = async (values) => {
+    const onCreate = async (values) => {
         console.log('Success:', values);
         const response = await axios.post('/books', values);
         if (response.data.success) {
@@ -27,54 +28,88 @@ const Book = (props) => {
         }
     };
 
+    const onEdit = async (values) => {
+        console.log('Success:', values);
+        // const response = await axios.post('/books', values);
+        // if (response.data.success) {
+        //     props.history.push(`/books`);
+        // }
+    };
+
+    const newBook = props.new;
+
+    const [form] = Form.useForm();
+
+
     const onFinishFailed = (errorInfo) => {
         console.log('Failed:', errorInfo);
     };
 
-    return (
-        <Form
-            {...layout}
-            name="basic"
-            initialValues={{
-                remember: true,
-            }}
-            onFinish={onFinish}
-            onFinishFailed={onFinishFailed}
-        >
-            <Form.Item
-                label="Name"
-                name="name"
-                rules={[
-                    {
-                        required: true,
-                        message: 'Please input book name!',
-                    },
-                ]}
-            >
-                <Input />
-            </Form.Item>
+    useEffect(() => {
 
-            <Form.Item
-                label="Author"
-                name="author"
-                rules={[
-                    {
-                        required: true,
-                        message: 'Please input book\'s author name!',
-                    },
-                ]}
+        const getData = async () => {
+            const response = await axios.get('/books/' + props.match.params.id);
+            var newData = response.data;
+            newData.date = new Date(newData.date)
+            console.log(newData);
+            form.setFieldsValue({
+                name: newData.name,
+                author: newData.author,
+                date: moment(newData.date)
+            });
+        }
+
+        if (!newBook) {
+            getData();
+        }
+    }, []);
+
+    return (
+        <div>
+            <Form
+                {...layout}
+                name="basic"
+                form={form}
+                onFinish={newBook ? onCreate : onEdit}
+                onFinishFailed={onFinishFailed}
             >
-                <Input />
-            </Form.Item>
-            <Form.Item label="DatePicker" name="date">
-                <DatePicker />
-            </Form.Item>
-            <Form.Item {...tailLayout}>
-                <Button type="primary" htmlType="submit" >
-                    Create
-                </Button>
-            </Form.Item>
-        </Form>
+                <Form.Item
+                    label="Name"
+                    name="name"
+                    rules={[
+                        {
+                            required: true,
+                            message: 'Please input book name!',
+                        },
+                    ]}
+                >
+                    <Input />
+                </Form.Item>
+
+                <Form.Item
+                    label="Author"
+                    name="author"
+                    rules={[
+                        {
+                            required: true,
+                            message: 'Please input book\'s author name!',
+                        },
+                    ]}
+                >
+                    <Input />
+                </Form.Item>
+
+                <Form.Item label="DatePicker" name="date">
+                    <DatePicker />
+                </Form.Item>
+
+                <Form.Item {...tailLayout}>
+                    <Button type="primary" htmlType="submit" >
+                        {newBook ? "Create" : "Edit"}
+                    </Button>
+                </Form.Item>
+            </Form>
+        </div>
     );
 };
 

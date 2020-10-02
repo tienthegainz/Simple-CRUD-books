@@ -10,13 +10,12 @@ import {
 function App() {
   return (
     <Router>
-      <div className="center">
-        <Route path="/books/create">
-          <Book />
-        </Route>
+      <div className="">
         <Route exact path="/">
           <BookList />
         </Route>
+        <Route exact path="/create/books" render={() => <Book new={true} />} />
+        <Route exact path="/books/:id" render={() => <Book new={false} />} />
         <Route exact path="/books">
           <BookList />
         </Route>
